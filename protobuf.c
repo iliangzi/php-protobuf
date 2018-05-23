@@ -1057,6 +1057,7 @@ static int pb_serialize_field_value(zval *this, writer_t *writer, uint32_t field
 	int r;
 	zval ret, method;
 	TSRMLS_FETCH();
+	char int_string[64]; 
 
 	if (Z_TYPE_PP(type) == IS_STRING) {
 		INIT_ZVAL(method);
@@ -1100,7 +1101,12 @@ static int pb_serialize_field_value(zval *this, writer_t *writer, uint32_t field
 				break;
 
 			case PB_TYPE_STRING:
-				r = writer_write_string(writer, field_number, Z_STRVAL_PP(value), Z_STRLEN_PP(value));
+				if(Z_TYPE_PP(value) == IS_LONG){
+					sprintf(int_string, "%llu", Z_LVAL_PP(value));
+					r = writer_write_string(writer, field_number, int_string, strlen(int_string));
+				}else {
+				    	r = writer_write_string(writer, field_number, Z_STRVAL_PP(value), Z_STRLEN_PP(value));
+				}
 				break;
 
 			default:
